@@ -1,5 +1,5 @@
 {
-    "name": "product-management",
+    "name": "customer-management",
     "version": "1.0.0",
     "description": "Simple customer management application",
     "scripts": {
