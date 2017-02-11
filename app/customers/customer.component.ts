@@ -42,6 +42,12 @@ function compareEmail(c: AbstractControl) : {[key: string]: boolean} | null {
 export class CustomerComponent implements OnInit {
     customer: Customer= new Customer();
     customerForm: FormGroup;
+    emailMessage: string;
+
+    private validationMessages = {
+        required: 'Please enter your email address.',
+        pattern: 'Please enter a valid email address.'
+    };
 
     constructor(private formBuilder: FormBuilder){
     }
@@ -59,6 +65,19 @@ export class CustomerComponent implements OnInit {
             rating: ['', validateRatingWithParam(1, 5)], // ['', validateRating] <- without parameters
             sendCatalog: true
         });
+
+        // Watch Observables for any changes
+        this.customerForm.get('notification').valueChanges.subscribe(value => this.updateNotifiation(value));
+        const emailControl = this.customerForm.get('emailGroup.email');
+        emailControl.valueChanges.subscribe(value => this.setMessage(emailControl));
+    }
+
+    setMessage(c: AbstractControl): void {
+        this.emailMessage = '';
+        if ((c.touched || c.dirty) && c.invalid){
+            this.emailMessage = Object.keys(c.errors)
+                .map(key => this.validationMessages[key]).join(' ');
+        }
     }
 
     updateNotifiation(type: string): void {
