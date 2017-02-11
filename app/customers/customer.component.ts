@@ -25,6 +25,16 @@ function validateRatingWithParam(minVal: number, maxVal: number) : ValidatorFn {
     }
 }
 
+function compareEmail(c: AbstractControl) : {[key: string]: boolean} | null {
+    let email = c.get('email');
+    let confirmEmail = c.get('confirmEmail');
+    if (email.pristine || confirmEmail.pristine)
+        return null;
+    if (email.value === confirmEmail.value)
+        return null;
+    return {'emailMatch' : true};
+}
+
 @Component({
     selector: 'my-signup',
     templateUrl: './app/customers/customer.component.html'
@@ -40,7 +50,10 @@ export class CustomerComponent implements OnInit {
         this.customerForm = this.formBuilder.group({ 
             firstName: ['', [Validators.required, Validators.minLength(3)]],
             lastName: ['', [Validators.required, Validators.minLength(50)]],
-            email: ['', [Validators.required, Validators.pattern("[a-z0-9._%+-]+@[a-z0-9.-]+")]],
+            emailGroup : this.formBuilder.group({
+                email: ['', [Validators.required, Validators.pattern("[a-z0-9._%+-]+@[a-z0-9.-]+")]],
+                confirmEmail: ['', Validators.required ],
+            }, {validator: compareEmail }),
             phone: '',
             notification: 'email',
             rating: ['', validateRatingWithParam(1, 5)], // ['', validateRating] <- without parameters
